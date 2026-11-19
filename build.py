@@ -281,6 +281,38 @@ def write(path, content):
     out.write_text(content, encoding="utf-8")
 
 
+def merchant_feed():
+    """Feed RSS 2.0 para Google Merchant Center (se publica en /merchant-feed.xml)."""
+    items = []
+    for p in CAT["products"]:
+        if not p.get("inStock"):
+            continue
+        link = URL + "/proteina-de-huevo-ova-pro/"
+        desc = (f"Proteína de albúmina (clara) de huevo en polvo, sin sabor. Un solo ingrediente: clara de huevo. "
+                f"{dec(CAT['scoop']['proteinGrams'])} g de proteína por scoop de {CAT['scoop']['grams']} g, 83 % proteína, 0 % lactosa. "
+                f"Bolsa de {p['sizeGrams']} g, {p['servings']} scoops. Contiene huevo.")
+        items.append(f"""<item>
+<g:id>{p['sku']}</g:id>
+<g:title>{e(p['name'])} Proteína de clara de huevo sin sabor</g:title>
+<g:description>{e(desc)}</g:description>
+<g:link>{link}</g:link>
+<g:image_link>{URL}/assets/img/{p['image']}.jpg</g:image_link>
+<g:additional_image_link>{URL}/assets/img/ova-pro-500g-clara-de-huevo.jpg</g:additional_image_link>
+<g:availability>in_stock</g:availability>
+<g:price>{p['price']/100:.2f} USD</g:price>
+<g:brand>OVA PRO+</g:brand>
+<g:condition>new</g:condition>
+{f"<g:gtin>{p['gtin']}</g:gtin>" if p['gtin'] else "<g:identifier_exists>no</g:identifier_exists>"}
+<g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Fitness &amp; Nutrition &gt; Vitamins &amp; Supplements</g:google_product_category>
+<g:product_type>Suplementos &gt; Proteína en polvo &gt; Proteína de huevo</g:product_type>
+<g:size>{p['sizeGrams']} g</g:size>
+<g:unit_pricing_measure>{p['sizeGrams']} g</g:unit_pricing_measure>
+<g:unit_pricing_base_measure>100 g</g:unit_pricing_base_measure>
+</item>""")
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0"><channel>'
+            f'<title>OVA PRO+</title><link>{URL}/</link><description>Productos OVA PRO+</description>' + "".join(items) + '</channel></rss>\n')
+
+
 def main():
     # Módulos JS generados desde /data (fuente única de verdad)
     js = PUB / "assets/js"
@@ -298,6 +330,7 @@ def main():
 
     sm = "".join(f"<url><loc>{URL}{p}</loc><lastmod>{UPDATED}</lastmod><priority>{pr}</priority></url>" for p, pr in sitemap)
     (PUB / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{sm}</urlset>\n', encoding="utf-8")
+    (PUB / "merchant-feed.xml").write_text(merchant_feed(), encoding="utf-8")
     (PUB / "robots.txt").write_text(
         "# Buscadores y asistentes de IA son bienvenidos: queremos que citen OVA PRO+ con datos correctos.\n"
         "User-agent: *\nAllow: /\nDisallow: /carrito/\nDisallow: /pago/\nDisallow: /api/\n\n"
