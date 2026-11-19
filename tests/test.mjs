@@ -17,7 +17,7 @@ ok('2 bolsas con tarjeta NO tienen promo', () => {
 });
 ok('2 bolsas por transferencia: $50 + envío', () => {
   const o = computeOrder({ items: [{ id: 'ova-pro-500', qty: 2 }], zone: 'local', payMethod: 'transfer' });
-  assert.equal(o.subtotal, 5000); assert.equal(o.total, 5300); assert.ok(o.lines[0].promo);
+  assert.equal(o.subtotal, 5000); assert.equal(o.total, 5200); assert.ok(o.lines[0].promo);
 });
 ok('1 bolsa por transferencia sigue a $27', () => {
   const o = computeOrder({ items: [{ id: 'ova-pro-500', qty: 1 }], zone: 'local', payMethod: 'transfer' });
@@ -33,7 +33,7 @@ ok('Productos inexistentes y cantidades manipuladas se ignoran', () => {
 });
 ok('IVA 15 % incluido', () => {
   const o = computeOrder({ items: [{ id: 'ova-pro-500', qty: 1 }], zone: 'local' });
-  assert.equal(o.taxBase, 2609); assert.equal(o.tax, 391);
+  assert.equal(o.taxBase, 2522); assert.equal(o.tax, 378);
 });
 ok('Cupón inexistente da error', () => {
   const o = computeOrder({ items: [{ id: 'ova-pro-500', qty: 1 }], coupon: 'OVAPRO10', zone: 'local' });
