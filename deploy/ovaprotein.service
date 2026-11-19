@@ -1,0 +1,18 @@
+[Unit]
+Description=OVA PRO+ (API PayPhone y bot WhatsApp)
+After=network.target
+
+[Service]
+Type=simple
+User=ovaprotein
+WorkingDirectory=/var/www/ovaprotein
+ExecStart=/usr/bin/env node server/server.mjs
+Environment=NODE_ENV=production PORT=3107 HOST=127.0.0.1
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=/var/www/ovaprotein/storage
+
+[Install]
+WantedBy=multi-user.target

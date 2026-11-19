@@ -1,0 +1,61 @@
+// Generado por build.py desde data/catalog.json. No editar a mano.
+export default {
+ "_nota": "Precios en CENTAVOS de USD con IVA incluido. Edita y ejecuta `python3 build.py`. El servidor recalcula todo con este archivo. La promo 2x50 solo aplica con payMethod 'transfer' (pedido por WhatsApp); el cobro con tarjeta (PayPhone) siempre usa el precio normal. freeFrom null = sin envío gratis.",
+ "currency": "USD",
+ "taxRate": 0.15,
+ "pricesIncludeTax": true,
+ "scoop": {
+  "grams": 40,
+  "proteinGrams": 33.2
+ },
+ "products": [
+  {
+   "id": "ova-pro-500",
+   "sku": "OVAPRO-500",
+   "gtin": "",
+   "name": "OVA PRO+ 500 g",
+   "short": "Bolsa de 500 g · 12 scoops",
+   "sizeGrams": 500,
+   "servings": 12,
+   "price": 2700,
+   "compareAt": null,
+   "image": "ova-pro-bolsa",
+   "tag": "",
+   "promo": false,
+   "inStock": true
+  }
+ ],
+ "coupons": {},
+ "shipping": {
+  "freeFrom": null,
+  "freeExcludes": [],
+  "zones": [
+   {
+    "id": "local",
+    "label": "Entrega local en la ciudad (24 h)",
+    "price": 300
+   },
+   {
+    "id": "nacional",
+    "label": "Resto de Ecuador continental (Servientrega 24–72 h)",
+    "price": 500
+   },
+   {
+    "id": "galapagos",
+    "label": "Galápagos (3–7 días)",
+    "price": 1200
+   }
+  ]
+ },
+ "promotions": [
+  {
+   "id": "2x50-transferencia",
+   "productId": "ova-pro-500",
+   "minQty": 2,
+   "unitPrice": 2500,
+   "payMethod": "transfer",
+   "label": "2 × 500 g por $50 pagando por transferencia",
+   "short": "2 por $50"
+  }
+ ]
+};
