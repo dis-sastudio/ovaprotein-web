@@ -209,7 +209,7 @@ Agregar al carrito
 
  Pedir por WhatsApp
 
-- Envío no incluido: $3.00 en la ciudad, $5.00 al resto de Ecuador continental.
+- Envío no incluido: $2.00 en Quito, $5.00 a otras provincias.
 - Paga con Visa o Mastercard a través de PayPhone, o por transferencia.
 - Contiene huevo. No apta para personas alérgicas al huevo.
 
@@ -797,7 +797,7 @@ Sí. Es clara de huevo, así que funciona en pancakes, waffles, avena horneada y
 ¿Contiene alérgenos?
 Contiene huevo. No contiene lácteos ni gluten como ingredientes.
 ¿Hacen envíos a todo Ecuador?
-Sí. Enviamos a Ecuador continental con Servientrega en 24–72 horas y a Galápagos en 3–7 días. El envío no está incluido en el precio: cuesta $3.00 en la ciudad y $5.00 al resto del país continental.
+Sí. Entregamos a domicilio en Quito y enviamos a las demás provincias de Ecuador continental con Servientrega en 24–72 horas. El envío no está incluido en el precio: cuesta $2.00 en Quito y $5.00 a otras provincias. Para Galápagos, consúltanos por WhatsApp.
 ¿Puedo pagar por transferencia?
 Sí, y es la forma de acceder a la promo de 2 bolsas por $50.00. Escríbenos por WhatsApp o elige “Transferencia” en el carrito y te enviamos los datos bancarios.
 ¿OVA PRO+ engorda?
@@ -820,13 +820,12 @@ Inicio / Envíos y pagos
  | 
  | Destino | Costo
 
- | Entrega local en la ciudad (24 h) | $3.00
+ | Quito (entrega a domicilio, 24 h) | $2.00
 
- | Resto de Ecuador continental (Servientrega 24–72 h) | $5.00
-
- | Galápagos (3–7 días) | $12.00
+ | Otras provincias de Ecuador continental (Servientrega 24–72 h) | $5.00
 
 - El costo del envío no está incluido en el precio del producto.
+- Galápagos: escríbenos por WhatsApp y te cotizamos.
 - Despachamos en máximo 1 día hábil después de confirmar el pago.
 - Te enviamos el número de guía por WhatsApp para que sigas tu pedido.
 

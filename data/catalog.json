@@ -31,18 +31,13 @@
     "zones": [
       {
         "id": "local",
-        "label": "Entrega local en la ciudad (24 h)",
-        "price": 300
+        "label": "Quito (entrega a domicilio, 24 h)",
+        "price": 200
       },
       {
         "id": "nacional",
-        "label": "Resto de Ecuador continental (Servientrega 24–72 h)",
+        "label": "Otras provincias de Ecuador continental (Servientrega 24–72 h)",
         "price": 500
-      },
-      {
-        "id": "galapagos",
-        "label": "Galápagos (3–7 días)",
-        "price": 1200
       }
     ]
   },

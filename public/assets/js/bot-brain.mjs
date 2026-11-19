@@ -87,7 +87,7 @@ const I = {
     text:
       `*Envíos a todo Ecuador*\n` +
       catalog.shipping.zones.map((z) => `• ${z.label}: ${money(z.price)}`).join('\n') +
-      `\n\nEl envío no está incluido en el precio. Te enviamos el número de guía al despachar.`,
+      `\n• Galápagos: escríbenos y te cotizamos.\n\nEl envío no está incluido en el precio. Te enviamos el número de guía al despachar.`,
     buttons: [{ id: 'pagos', title: 'Formas de pago' }, { id: 'comprar', title: 'Comprar' }, { id: 'menu', title: 'Menú' }],
   }),
   pagos: () => ({

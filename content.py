@@ -221,7 +221,7 @@ def PAGES_CONTENT(c):
 <div class="buy-row"><div class="qty" role="group" aria-label="Cantidad"><button type="button" data-qty-step="-1" data-target="#pdp-qty" aria-label="Quitar uno">−</button><input id="pdp-qty" type="number" min="1" max="20" value="1" aria-label="Cantidad"><button type="button" data-qty-step="1" data-target="#pdp-qty" aria-label="Agregar uno">+</button></div>
 <button class="btn btn-primary" data-add data-qty-from="#pdp-qty">Agregar al carrito</button></div>
 <a class="btn btn-wa btn-block" data-wa-variant href="{wa(f"Hola, quiero pedir {p500['name']} ({money(p500['price'])}).")}">{c["ICON_WA"]} Pedir por WhatsApp</a>
-<ul class="assure"><li>Envío no incluido: {money(CAT['shipping']['zones'][0]['price'])} en la ciudad, {ship_nat} al resto de Ecuador continental.</li><li>Paga con Visa o Mastercard a través de PayPhone, o por transferencia.</li><li>Contiene huevo. No apta para personas alérgicas al huevo.</li></ul>
+<ul class="assure"><li>Envío no incluido: {money(CAT['shipping']['zones'][0]['price'])} en Quito, {ship_nat} a otras provincias.</li><li>Paga con Visa o Mastercard a través de PayPhone, o por transferencia.</li><li>Contiene huevo. No apta para personas alérgicas al huevo.</li></ul>
 </div></div>
 
 <div class="tabs"><div class="tablist" role="tablist" aria-label="Información del producto">
@@ -417,7 +417,7 @@ def PAGES_CONTENT(c):
     # ================= FAQ =================
     path = "/preguntas-frecuentes/"
     allfaq = home_faq + pdp_faq + [
-        ("¿Hacen envíos a todo Ecuador?", f"Sí. Enviamos a Ecuador continental con Servientrega en 24–72 horas y a Galápagos en 3–7 días. El envío no está incluido en el precio: cuesta {money(CAT['shipping']['zones'][0]['price'])} en la ciudad y {ship_nat} al resto del país continental."),
+        ("¿Hacen envíos a todo Ecuador?", f"Sí. Entregamos a domicilio en Quito y enviamos a las demás provincias de Ecuador continental con Servientrega en 24–72 horas. El envío no está incluido en el precio: cuesta {money(CAT['shipping']['zones'][0]['price'])} en Quito y {ship_nat} a otras provincias. Para Galápagos, consúltanos por WhatsApp."),
         
         ("¿Puedo pagar por transferencia?", f"Sí, y es la forma de acceder a la promo de 2 bolsas por {promo_price}. Escríbenos por WhatsApp o elige “Transferencia” en el carrito y te enviamos los datos bancarios."),
         ("¿OVA PRO+ engorda?", f"Ningún alimento engorda por sí solo; depende de tus calorías totales. Un scoop aporta {kcal_sc} kcal y casi nada de grasa, por eso se usa mucho en etapas de definición."),
@@ -439,7 +439,7 @@ def PAGES_CONTENT(c):
                       desc=f"Envíos de OVA PRO+ a todo Ecuador con Servientrega; el envío se paga aparte. " + ("Paga con tarjeta vía PayPhone o por transferencia " if CARD else "Pago por transferencia o depósito ") + f"(promo 2 por {promo_price}).",
                       body=c["page_head"]([("/", "Inicio"), (path, "Envíos y pagos")], "Envíos y pagos") + f'''<section class="section"><div class="wrap prose">
 <h2>Envíos</h2><table><thead><tr><th scope=col>Destino</th><th scope=col class=num>Costo</th></tr></thead><tbody>{ztr}</tbody></table>
-<ul><li>El costo del envío no está incluido en el precio del producto.</li><li>Despachamos en máximo 1 día hábil después de confirmar el pago.</li><li>Te enviamos el número de guía por WhatsApp para que sigas tu pedido.</li></ul>
+<ul><li>El costo del envío no está incluido en el precio del producto.</li><li>Galápagos: escríbenos por WhatsApp y te cotizamos.</li><li>Despachamos en máximo 1 día hábil después de confirmar el pago.</li><li>Te enviamos el número de guía por WhatsApp para que sigas tu pedido.</li></ul>
 <h2>Formas de pago</h2>
 <ul>{CARD_LIS}<li><strong>Transferencia o depósito</strong>: elige “Transferencia” en el carrito o escríbenos por WhatsApp. Con transferencia aplica la promo de 2 bolsas por {promo_price}.</li></ul>
 <p>Todos los precios incluyen IVA. Emitimos factura electrónica con los datos que ingreses en el carrito.</p>

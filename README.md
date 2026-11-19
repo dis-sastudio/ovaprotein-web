@@ -31,7 +31,7 @@ Edita `data/site.json` y ejecuta `python3 build.py`:
 | `tiktok` | URL si existe (Instagram @ovaprotein y Facebook /ovaprotein ya están) |
 | `reviewer` | Nombre del nutricionista que revisa el contenido (mejora E‑E‑A‑T) |
 
-En `data/catalog.json` confirma los costos de envío por zona ($3 local, $5 nacional y $12 Galápagos son de ejemplo). Precio actual: OVA PRO+ 500 g $27; promo 2 bolsas a $25 c/u solo por transferencia (`promotions`), sin envío gratis (`freeFrom: null`). Para volver a vender 1 kg, combos o cupones, agrégalos en `products` / `coupons`. Si un producto no lleva IVA, cambia `pricesIncludeTax`/`taxRate` con tu contador.
+En `data/catalog.json` confirma los costos de envío por zona (Quito $2, otras provincias $5; Galápagos se cotiza por WhatsApp). Precio actual: OVA PRO+ 500 g $27; promo 2 bolsas a $25 c/u solo por transferencia (`promotions`), sin envío gratis (`freeFrom: null`). Para volver a vender 1 kg, combos o cupones, agrégalos en `products` / `coupons`. Si un producto no lleva IVA, cambia `pricesIncludeTax`/`taxRate` con tu contador.
 
 Revisa con un abogado las plantillas de `/legal/`.
 
