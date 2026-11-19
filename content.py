@@ -483,6 +483,7 @@ def PAGES_CONTENT(c):
 <div class="field"><label for="direccion">Dirección</label><input id="direccion" name="direccion" autocomplete="street-address" required></div>
 <div class="field"><label for="referencia">Referencia (opcional)</label><input id="referencia" name="referencia"></div>
 <div class="field"><label for="notas">Notas para el pedido (opcional)</label><textarea id="notas" name="notas" rows="2"></textarea></div>
+<div style="position:absolute;left:-5000px" aria-hidden="true"><label>No llenar<input name="website" tabindex="-1" autocomplete="off"></label></div>
 <label style="display:flex;gap:.5rem;align-items:flex-start;font-size:.95rem"><input type="checkbox" name="acepto" required style="margin-top:.3rem"> Acepto los <a href="/legal/terminos/" target="_blank">términos</a> y la <a href="/legal/privacidad/" target="_blank">política de privacidad</a>.</label>
 </form>
 </div>
@@ -502,8 +503,8 @@ def PAGES_CONTENT(c):
 <div id="card-box"{"" if CARD else " hidden"}><button type="button" class="btn btn-primary btn-block" id="pay-card">Pagar con tarjeta</button>
 <label style="display:flex;gap:.45rem;font-size:.88rem;margin:.6rem 0;color:var(--muted)"><input type="checkbox" id="pay-app"> Prefiero pagar con mi saldo de la app PayPhone</label>
 <p class="pay-logos">Visa · Mastercard · procesado por PayPhone</p></div>
-<div id="transfer-box"{" hidden" if CARD else ""}><button type="button" class="btn btn-wa btn-block" id="pay-wa">{c["ICON_WA"]} Enviar pedido por WhatsApp</button>
-<p style="font-size:.85rem;color:var(--muted);margin:.6rem 0 0">Te respondemos con los datos bancarios. Despachamos al recibir el comprobante.</p></div>
+<div id="transfer-box"{" hidden" if CARD else ""}><button type="button" class="btn btn-wa btn-block" id="pay-wa">Hacer pedido por transferencia</button>
+<p style="font-size:.85rem;color:var(--muted);margin:.6rem 0 0">Registramos tu pedido y te mostramos los datos para transferir (también por correo). Despachamos al recibir el comprobante.</p></div>
 <p class="msg err" id="pay-error" aria-live="polite"></p>
 </aside></div></div></section>'''))
     pages.append(dict(path="/pago/", title="Confirmación de pago | OVA PRO+", desc="Estado de tu pago.", noindex=True, scripts=("app", "pago"),
@@ -627,11 +628,14 @@ def LEGAL(c):
 <h2>5. Cambios y devoluciones</h2><p>Ver <a href="/legal/cambios-y-devoluciones/">política de cambios y devoluciones</a>, conforme a la Ley Orgánica de Defensa del Consumidor.</p>
 <h2>6. Promociones</h2><p>Las promociones y códigos tienen las condiciones indicadas en <a href="/promociones/">Promociones</a> y no son acumulables salvo que se indique.</p>'''),
         dict(path="/legal/privacidad/", title="Política de privacidad", desc="Cómo tratamos tus datos personales en OVA PRO+.",
-             body=f'''<p class="note-box">Plantilla base alineada con la Ley Orgánica de Protección de Datos Personales del Ecuador. Revísala con tu asesor legal.</p>
-<h2>Datos que recogemos</h2><p>Nombre, documento de identidad, teléfono, correo y dirección, para procesar tu pedido, emitir la factura y coordinar la entrega.</p>
-<h2>Con quién los compartimos</h2><p>Con PayPhone (procesamiento del pago), la empresa de mensajería y, si nos escribes, con WhatsApp (Meta). No vendemos tus datos.</p>
-<h2>Tus derechos</h2><p>Puedes pedir acceso, rectificación, eliminación u oposición escribiendo a {SITE["email"]}.</p>
-<h2>Cookies</h2><p>Usamos almacenamiento local del navegador para recordar tu carrito y, si se activa, herramientas de analítica.</p>'''),
+             body=f'''<p class="note-box">Texto base alineado con la Ley Orgánica de Protección de Datos Personales del Ecuador. Revísalo con tu asesor legal.</p>
+<h2>Datos que recogemos</h2><p>Cuando haces un pedido guardamos tu nombre, número de cédula, RUC o pasaporte, celular, correo, provincia, ciudad, dirección y referencia de entrega, junto con el detalle de tu compra.</p>
+<h2>Para qué los usamos</h2><ul><li>Procesar y entregar tu pedido, y avisarte de su estado por correo o WhatsApp.</li><li>Emitir tu factura y cumplir obligaciones tributarias.</li><li>Atenderte si tienes una consulta o un reclamo, y reconocerte en tu próxima compra.</li></ul>
+<p>No usamos tus datos para enviarte publicidad sin tu permiso.</p>
+<h2>Con quién los compartimos</h2><p>Solo con quien hace falta para tu pedido: la empresa de mensajería (nombre, teléfono y dirección de entrega), PayPhone si pagas con tarjeta y nuestro proveedor de correo. Si nos escribes por WhatsApp, Meta procesa esa conversación. No vendemos ni alquilamos tus datos.</p>
+<h2>Cómo los protegemos y cuánto tiempo</h2><p>Se guardan en nuestro servidor, con acceso restringido por contraseña al equipo de OVA Nutrition. Conservamos los datos de pedidos el tiempo que exige la normativa tributaria y, el resto, mientras seas cliente o hasta que nos pidas eliminarlos.</p>
+<h2>Tus derechos</h2><p>Conforme a la Ley Orgánica de Protección de Datos Personales del Ecuador, puedes pedir acceso, rectificación, actualización, eliminación u oposición escribiendo a {SITE["email"]} o por WhatsApp.</p>
+<h2>Cookies</h2><p>Usamos almacenamiento local del navegador para recordar tu carrito y tus datos de entrega en tu propio dispositivo, y, si se activa, herramientas de analítica.</p>'''),
         dict(path="/legal/cambios-y-devoluciones/", title="Cambios y devoluciones", desc="Política de cambios y devoluciones de OVA PRO+.",
              body=f'''<p class="note-box">Plantilla base. Ajusta plazos y condiciones antes de publicar.</p>
 <p>Si tu pedido llega dañado, abierto o con un producto equivocado, escríbenos por WhatsApp dentro de los 7 días siguientes a la entrega con fotos del empaque. Te enviamos el reemplazo sin costo.</p>

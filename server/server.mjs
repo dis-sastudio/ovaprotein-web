@@ -26,7 +26,9 @@ const routes = {
   '/api/pago/preparar': () => import('../netlify/functions/pago-preparar.mjs'),
   '/api/pago/confirmar': () => import('../netlify/functions/pago-confirmar.mjs'),
   '/api/whatsapp': () => import('../netlify/functions/whatsapp-webhook.mjs'),
+  '/api/pedidos': () => import('../netlify/functions/pedidos.mjs'),
 };
+const prefixRoutes = [['/api/admin', () => import('../netlify/functions/admin.mjs')]];
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -48,8 +50,9 @@ async function serveStatic(req, res, urlPath) {
       file = path.join(file, 'index.html'); st = await fsp.stat(file);
     }
     const ext = path.extname(file).toLowerCase();
-    const cache = p.startsWith('/assets/js/') ? 'public, max-age=3600' : p.startsWith('/assets/') ? 'public, max-age=31536000, immutable' : 'public, max-age=300';
-    res.writeHead(200, { 'Content-Type': TYPES[ext] || 'application/octet-stream', 'Content-Length': st.size, 'Cache-Control': cache, ...SEC });
+    const isAdmin = p.startsWith('/admin');
+    const cache = isAdmin ? 'no-store' : p.startsWith('/assets/js/') ? 'public, max-age=3600' : p.startsWith('/assets/') ? 'public, max-age=31536000, immutable' : 'public, max-age=300';
+    res.writeHead(200, { 'Content-Type': TYPES[ext] || 'application/octet-stream', 'Content-Length': st.size, 'Cache-Control': cache, ...SEC, ...(isAdmin ? { 'X-Robots-Tag': 'noindex, nofollow' } : {}) });
     if (req.method === 'HEAD') return res.end();
     fs.createReadStream(file).pipe(res);
   } catch {
@@ -88,7 +91,8 @@ http.createServer((req, res) => {
   if (CANON && host && host !== CANON && !host.startsWith('127.') && host !== 'localhost' && !/^\d+\.\d+\.\d+\.\d+$/.test(host)) {
     res.writeHead(301, { Location: `https://${CANON}${url.pathname}${url.search}` }); return res.end();
   }
-  const load = routes[url.pathname.replace(/\/$/, '')];
+  const clean = url.pathname.replace(/\/$/, '');
+  const load = routes[clean] || prefixRoutes.find(([p]) => clean === p || clean.startsWith(p + '/'))?.[1];
   if (load) return serveApi(req, res, url, load);
   if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405); return res.end(); }
   serveStatic(req, res, url.pathname);

@@ -135,3 +135,10 @@ python3 build.py         # regenera /public
 npm install && npm test  # pruebas de precios y del bot
 npx netlify dev          # sitio + funciones en http://localhost:8888
 ```
+
+## Pedidos, clientes y panel
+
+- Cada pedido de la web (transferencia o tarjeta) se guarda como `OVA-0001`, `OVA-0002`… en `DATA_DIR/pedidos/`, y el cliente en `DATA_DIR/clientes/` (por cédula/RUC). En Coolify, `DATA_DIR=/app/storage` es un volumen persistente: no se borra al redesplegar.
+- Panel privado: `/admin` (contraseña `ADMIN_PASSWORD`). Lista y búsqueda de pedidos, cambio de estado (por pagar → pagado → enviado con guía → entregado), pedidos manuales de WhatsApp, clientes, resumen mensual, stock y exportación a Excel (CSV).
+- Correos automáticos al cliente: pedido recibido (con datos bancarios), pago confirmado, enviado (con guía) y entregado. Requiere las variables `SMTP_*`.
+- Pruebas: `npm test` y `node tests/orders.test.mjs`.

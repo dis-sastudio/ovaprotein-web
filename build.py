@@ -333,7 +333,7 @@ def main():
     (PUB / "merchant-feed.xml").write_text(merchant_feed(), encoding="utf-8")
     (PUB / "robots.txt").write_text(
         "# Buscadores y asistentes de IA son bienvenidos: queremos que citen OVA PRO+ con datos correctos.\n"
-        "User-agent: *\nAllow: /\nDisallow: /carrito/\nDisallow: /pago/\nDisallow: /api/\n\n"
+        "User-agent: *\nAllow: /\nDisallow: /carrito/\nDisallow: /pago/\nDisallow: /api/\nDisallow: /admin/\n\n"
         + "".join(f"User-agent: {b}\nAllow: /\n\n" for b in ["GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "PerplexityBot", "Google-Extended", "Applebot-Extended", "Bingbot"])
         + f"Sitemap: {URL}/sitemap.xml\n", encoding="utf-8")
 

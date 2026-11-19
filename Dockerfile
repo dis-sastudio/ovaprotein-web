@@ -1,8 +1,9 @@
 # Imagen para Coolify / Docker: sirve el sitio y las rutas /api (PayPhone, bot WhatsApp)
-FROM node:20-alpine
+FROM node:22-alpine
 WORKDIR /app
 ENV NODE_ENV=production PORT=3107 HOST=0.0.0.0 DATA_DIR=/app/storage
-COPY package.json ./
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
 COPY public ./public
 COPY server ./server
 COPY netlify/functions ./netlify/functions

@@ -110,10 +110,48 @@ $('#pay-card').addEventListener('click', async () => {
   }
 });
 
-$('#pay-wa').addEventListener('click', () => {
+const docTypeName = (v) => ({ 1: 'cedula', 2: 'ruc', 3: 'pasaporte' })[v] || 'cedula';
+
+function showConfirmation(r, o, cu) {
+  const wa = waLink(`Hola, hice el pedido ${r.id} por ${fmt(r.total)} en la web. Adjunto el comprobante de transferencia.`);
+  const bank = r.bank && r.bank.length
+    ? `<div class="answer"><p><strong>Transfiere ${fmt(r.total)} a:</strong><br>${r.bank.map(escapeHtml).join('<br>')}<br><strong>Referencia:</strong> ${escapeHtml(r.id)}</p></div>`
+    : `<p>Te enviamos los datos de la cuenta por WhatsApp en unos minutos.</p>`;
+  document.querySelector('.checkout').outerHTML = `<div class="box status-card" id="done" tabindex="-1" style="text-align:left;max-width:640px">
+    <p class="icon" style="color:var(--emerald-ink)">✓</p>
+    <h2>Pedido ${escapeHtml(r.id)} registrado</h2>
+    <p class="lead">Total ${fmt(r.total)} (incluye envío ${fmt(r.shipping)}).</p>
+    ${bank}
+    <p>${r.emailSent ? `También te enviamos estos datos a <strong>${escapeHtml(cu.email)}</strong>.` : 'Guarda tu número de pedido.'} Cuando transfieras, envíanos el comprobante por WhatsApp y despachamos tu pedido.</p>
+    <p><a class="btn btn-wa" target="_blank" rel="noopener" href="${wa}">Enviar comprobante por WhatsApp</a></p>
+  </div>`;
+  document.getElementById('done').focus();
+}
+
+$('#pay-wa').addEventListener('click', async () => {
   if (!validate()) return;
-  const cu = customer(); const o = computeOrder({ ...cart.get(), payMethod: 'transfer' });
-  const msg = `Hola, quiero hacer este pedido de OVA PRO+:\n${orderSummaryText(o)}\n\nNombre: ${cu.nombre}\nCédula/RUC: ${cu.documento}\nCelular: ${cu.telefono}\nCorreo: ${cu.email}\nDirección: ${cu.direccion}, ${cu.ciudad}, ${cu.provincia}${cu.referencia ? '\nReferencia: ' + cu.referencia : ''}${cu.notas ? '\nNotas: ' + cu.notas : ''}\n\nPago por transferencia, por favor envíenme los datos.`;
-  window.gtag?.('event', 'pedido_whatsapp', { value: o.total / 100, currency: 'USD' });
-  window.open(waLink(msg), '_blank', 'noopener');
+  const btn = $('#pay-wa'); const cu = customer(); const c = cart.get();
+  const o = computeOrder({ ...c, payMethod: 'transfer' });
+  btn.disabled = true; const label = btn.innerHTML; btn.textContent = 'Registrando tu pedido…';
+  try {
+    const res = await fetch('/api/pedidos', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: c.items, zone: c.zone, coupon: c.coupon, acepto: !!form.elements.acepto.checked, website: form.elements.website?.value || '',
+        customer: { name: cu.nombre, docType: docTypeName(cu.tipo_doc), document: cu.documento, phone: cu.telefono, email: cu.email,
+          province: cu.provincia, city: cu.ciudad, address: cu.direccion, reference: cu.referencia, notes: cu.notas },
+      }),
+    });
+    const r = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(r.error || 'No pudimos registrar el pedido.');
+    window.gtag?.('event', 'purchase', { transaction_id: r.id, value: r.total / 100, currency: 'USD', payment_type: 'transferencia' });
+    cart.clear();
+    showConfirmation(r, o, cu);
+  } catch (err) {
+    // Si el servidor no responde, el pedido no se pierde: se envía por WhatsApp como antes.
+    $('#pay-error').textContent = err.message + ' Te abrimos WhatsApp para completar el pedido.';
+    const msg = `Hola, quiero hacer este pedido de OVA PRO+:\n${orderSummaryText(o)}\n\nNombre: ${cu.nombre}\nCédula/RUC: ${cu.documento}\nCelular: ${cu.telefono}\nCorreo: ${cu.email}\nDirección: ${cu.direccion}, ${cu.ciudad}, ${cu.provincia}${cu.referencia ? '\nReferencia: ' + cu.referencia : ''}${cu.notas ? '\nNotas: ' + cu.notas : ''}\n\nPago por transferencia.`;
+    if (!/términos|correo|cédula|RUC|celular|dirección|nombre|pasaporte/i.test(err.message)) window.open(waLink(msg), '_blank', 'noopener');
+    btn.disabled = false; btn.innerHTML = label;
+  }
 });

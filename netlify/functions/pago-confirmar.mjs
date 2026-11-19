@@ -1,11 +1,11 @@
 // POST /api/pago/confirmar  → confirma la transacción con PayPhone (obligatorio en los primeros 5 minutos)
-// Variables: PAYPHONE_TOKEN, RESEND_API_KEY (opcional), ORDER_EMAIL_TO (opcional), ORDER_EMAIL_FROM (opcional)
+// y marca el pedido como pagado. Variables: PAYPHONE_TOKEN
 import { getStore } from '../../server/store.mjs';
+import { getOrder, saveOrder, setStatus } from '../../server/orders.mjs';
+import { notifyCustomer, notifyOwner } from '../../server/mailer.mjs';
 
 const CONFIRM_URL = 'https://pay.payphonetodoesposible.com/api/button/V2/Confirm';
-const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
-const money = (c) => '$' + (c / 100).toFixed(2);
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
 export default async (req) => {
   if (req.method !== 'POST') return json({ error: 'Método no permitido' }, 405);
@@ -37,35 +37,27 @@ export default async (req) => {
     date: t.date, message: approved ? '' : t.message,
   };
 
-  // Registro + notificación una sola vez por pedido
-  let store, rec;
-  try { store = getStore('pedidos'); rec = await store.get(clientTxId, { type: 'json' }); } catch (e) { console.error(e); }
-  if (rec && rec.status === 'pendiente') {
-    // Verifica que el monto cobrado coincida con el calculado al preparar
-    const amountOk = !approved || t.amount === rec.order.total;
-    rec.status = approved ? (amountOk ? 'pagado' : 'revisar_monto') : 'rechazado';
-    rec.payphone = result; rec.confirmedAt = new Date().toISOString();
-    await store.setJSON(clientTxId, rec).catch(() => {});
-    if (approved) await notify(clientTxId, rec).catch((e) => console.error('Notificación', e));
+  const map = await getStore('payphone-tx').get(clientTxId, { type: 'json' }).catch(() => null);
+  const order = map ? await getOrder(map.orderId) : null;
+  if (order) {
+    result.orderId = order.id;
+    order.payphone = { ...result, clientTxId };
+    if (approved && order.status === 'pendiente_pago') {
+      const amountOk = t.amount === order.total;
+      await saveOrder(order);
+      const { order: updated } = await setStatus(order.id, {
+        status: 'pagado', by: 'PayPhone',
+        note: amountOk ? `Pago con tarjeta aprobado (autorización ${t.authorizationCode || '—'})` : `REVISAR: PayPhone cobró ${t.amount} y el pedido es ${order.total}`,
+      });
+      await notifyCustomer(updated, 'pagado');
+      await saveOrder(updated);
+      notifyOwner(updated).catch(() => {});
+    } else if (!approved && order.status === 'pendiente_pago') {
+      await saveOrder(order);
+      await setStatus(order.id, { status: 'cancelado', by: 'PayPhone', note: `Pago con tarjeta no aprobado: ${t.transactionStatus || t.message || ''}` });
+    }
   }
   return json(result);
 };
-
-async function notify(id, rec) {
-  const { RESEND_API_KEY, ORDER_EMAIL_TO, ORDER_EMAIL_FROM } = process.env;
-  if (!RESEND_API_KEY || !ORDER_EMAIL_TO) return;
-  const c = Object.fromEntries(Object.entries(rec.customer).map(([k, v]) => [k, esc(v)])), o = rec.order;
-  const lines = o.lines.map((l) => `<li>${l.qty} × ${esc(l.name)} — ${money(l.total)}</li>`).join('');
-  const html = `<h2>Nuevo pedido pagado ${id}</h2><ul>${lines}</ul>
-    <p>Descuento: ${money(o.discount)} ${o.coupon || ''}<br>Envío (${o.zone}): ${money(o.shipping)}<br><strong>Total: ${money(o.total)}</strong> (IVA ${money(o.tax)})</p>
-    <p><strong>${c.name}</strong><br>Doc: ${c.document}<br>Tel: ${c.phone}<br>Email: ${c.email}<br>${c.address}, ${c.city}, ${c.province}<br>Ref: ${c.reference}<br>Notas: ${c.notes}</p>
-    <p>PayPhone: autorización ${rec.payphone.authorizationCode} · ${rec.payphone.cardBrand || ''} ${rec.payphone.lastDigits || ''} · estado ${rec.status}</p>
-    <p><a href="https://wa.me/${c.phone.replace(/\D/g, '')}">Escribir al cliente por WhatsApp</a></p>`;
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: ORDER_EMAIL_FROM || 'OVA PRO+ <pedidos@ovaprotein.com>', to: ORDER_EMAIL_TO.split(','), subject: `Pedido pagado ${id} — ${money(o.total)}`, html, reply_to: c.email }),
-  });
-}
 
 export const config = { path: '/api/pago/confirmar' };

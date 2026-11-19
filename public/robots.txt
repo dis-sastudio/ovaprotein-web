@@ -4,6 +4,7 @@ Allow: /
 Disallow: /carrito/
 Disallow: /pago/
 Disallow: /api/
+Disallow: /admin/
 
 User-agent: GPTBot
 Allow: /

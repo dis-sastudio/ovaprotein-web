@@ -1,5 +1,5 @@
-// Almacenamiento simple de pedidos y estado del bot.
-// En Netlify usa Netlify Blobs; en un VPS guarda archivos JSON en DATA_DIR (por defecto ./storage).
+// Almacenamiento simple de pedidos, clientes y estado del bot.
+// En Netlify usa Netlify Blobs; en el VPS guarda archivos JSON en DATA_DIR (volumen persistente /app/storage).
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -9,11 +9,12 @@ if (onNetlify) {
   try { ({ getStore: netlifyGetStore } = await import('@netlify/blobs')); } catch { netlifyGetStore = null; }
 }
 
-const DATA_DIR = process.env.DATA_DIR || path.resolve(process.cwd(), 'storage');
+const dataDir = () => process.env.DATA_DIR || path.resolve(process.cwd(), 'storage');
 const safe = (k) => encodeURIComponent(String(k)).slice(0, 180);
+const unsafe = (f) => decodeURIComponent(f.replace(/\.json$/, ''));
 
 function fileStore(name) {
-  const dir = path.join(DATA_DIR, name.replace(/[^a-z0-9_-]/gi, ''));
+  const dir = path.join(dataDir(), name.replace(/[^a-z0-9_-]/gi, ''));
   const file = (k) => path.join(dir, safe(k) + '.json');
   return {
     async get(key, opts = {}) {
@@ -28,15 +29,29 @@ function fileStore(name) {
     },
     async setJSON(key, obj) {
       await fs.mkdir(dir, { recursive: true });
-      const tmp = file(key) + '.tmp';
+      const tmp = file(key) + '.' + process.pid + '.tmp';
       await fs.writeFile(tmp, JSON.stringify(obj, null, 1));
       await fs.rename(tmp, file(key));
     },
     async delete(key) { await fs.rm(file(key), { force: true }); },
+    async list() {
+      try {
+        const names = await fs.readdir(dir);
+        return { blobs: names.filter((n) => n.endsWith('.json')).map((n) => ({ key: unsafe(n) })) };
+      } catch { return { blobs: [] }; }
+    },
   };
 }
 
 export function getStore(name) {
   if (netlifyGetStore) return netlifyGetStore(name);
   return fileStore(name);
+}
+
+/** Lee todos los documentos JSON de una colección. */
+export async function readAll(name) {
+  const s = getStore(name);
+  const { blobs } = await s.list();
+  const out = await Promise.all(blobs.map((b) => s.get(b.key, { type: 'json' }).catch(() => null)));
+  return out.filter(Boolean);
 }

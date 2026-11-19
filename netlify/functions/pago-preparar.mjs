@@ -2,6 +2,7 @@
 // Variables de entorno: PAYPHONE_TOKEN, PAYPHONE_STORE_ID, SITE_URL
 import { computeOrder, payphoneAmounts } from '../../public/assets/js/pricing.mjs';
 import { getStore } from '../../server/store.mjs';
+import { createOrder } from '../../server/orders.mjs';
 
 const PREPARE_URL = 'https://pay.payphonetodoesposible.com/api/button/Prepare';
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
@@ -22,18 +23,17 @@ export default async (req) => {
   const blocking = order.errors.filter((e) => !/código/i.test(e));
   if (blocking.length) return json({ error: blocking.join(' ') }, 400);
 
-  const cu = body.customer || {};
-  const customer = {
-    name: clean(cu.name), email: clean(cu.email), phone: clean(cu.phone, 16), document: clean(cu.document, 13),
-    documentType: ['1', '2', '3'].includes(String(cu.documentType)) ? Number(cu.documentType) : 1,
-    province: clean(cu.province), city: clean(cu.city), address: clean(cu.address, 200), reference: clean(cu.reference, 200), notes: clean(cu.notes, 300),
-  };
-  if (!customer.name || !customer.email || !customer.phone || !customer.address) return json({ error: 'Completa tus datos de entrega.' }, 400);
-
-  const clientTransactionId = 'OVA' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase();
+  const created = await createOrder({
+    items: body.items, coupon: body.coupon, zone: body.zone, payMethod: 'card', channel: 'web',
+    status: 'pendiente_pago', customer: body.customer, notes: body.customer?.notes,
+  });
+  if (created.error) return json({ error: created.error }, 400);
+  const saved = created.order;
+  const customer = saved.customer;
+  const clientTransactionId = saved.id.replace('-', '') + Math.random().toString(36).slice(2, 6).toUpperCase();
   const site = (SITE_URL || new URL(req.url).origin).replace(/\/$/, '');
   const amounts = payphoneAmounts(order);
-  const reference = ('OVA PRO+ ' + order.lines.map((l) => `${l.qty}x${l.sku}`).join(' ')).slice(0, 100);
+  const reference = (`Pedido ${saved.id} OVA PRO+ ` + order.lines.map((l) => `${l.qty}x${l.sku}`).join(' ')).slice(0, 100);
 
   const payload = {
     ...amounts,
@@ -67,17 +67,11 @@ export default async (req) => {
     return json({ error: 'PayPhone no respondió. Intenta en un minuto o pide por WhatsApp.' }, 502);
   }
 
-  // Guardamos el pedido pendiente para confirmarlo y notificarlo después.
-  try {
-    await getStore('pedidos').setJSON(clientTransactionId, {
-      status: 'pendiente', createdAt: new Date().toISOString(), paymentId: data.paymentId,
-      order: { lines: order.lines, subtotal: order.subtotal, discount: order.discount, coupon: order.couponApplied?.code || null,
-        shipping: order.shipping, zone: order.zone.label, tax: order.tax, total: order.total },
-      customer,
-    });
-  } catch (e) { console.error('Blobs no disponible', e); }
+  // Relación transacción PayPhone → pedido, para confirmarlo después.
+  try { await getStore('payphone-tx').setJSON(clientTransactionId, { orderId: saved.id, paymentId: data.paymentId, at: new Date().toISOString() }); }
+  catch (e) { console.error('No se pudo guardar la transacción', e); }
 
-  return json({ clientTransactionId, total: order.total, payWithCard: data.payWithCard, payWithPayPhone: data.payWithPayPhone });
+  return json({ clientTransactionId, orderId: saved.id, total: order.total, payWithCard: data.payWithCard, payWithPayPhone: data.payWithPayPhone });
 };
 
 export const config = { path: '/api/pago/preparar' };
