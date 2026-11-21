@@ -1,0 +1,35 @@
+# Publica los artículos programados del blog.
+# Cada mañana (06:05 hora de Ecuador) regenera /public con build.py. Si ese día
+# toca publicar un artículo (campo "published" en content.py), hace commit y push,
+# y el despliegue automático (Coolify o Netlify) sube la nueva versión.
+name: Publicar artículos programados
+
+on:
+  schedule:
+    - cron: "5 11 * * *"   # 11:05 UTC = 06:05 en Ecuador
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generar sitio
+        run: python3 build.py
+      - name: Publicar si hay cambios
+        run: |
+          if [ -z "$(git status --porcelain -- public)" ]; then
+            echo "Hoy no hay artículos nuevos."
+            exit 0
+          fi
+          git config user.name "ova-bot"
+          git config user.email "hola@ovaprotein.com"
+          git add public
+          git commit -m "Blog: publicar artículos programados ($(TZ=America/Guayaquil date +%F))"
+          git push

@@ -160,7 +160,7 @@ $$('[data-qty-step]').forEach((b) => b.addEventListener('click', () => {
 $$('input[name=variant]').forEach((r) => r.addEventListener('change', () => {
   const p = findProduct(r.value);
   $$('[data-variant-price]').forEach((el) => (el.textContent = fmt(p.price)));
-  $$('[data-variant-per]').forEach((el) => (el.textContent = `${fmt(Math.round(p.price / p.servings))} por scoop · ${p.servings} scoops`));
+  $$('[data-variant-per]').forEach((el) => (el.textContent = `${fmt(Math.round(p.price / p.servings))} por porción · ${p.servings} porciones`));
   const wa = $('[data-wa-variant]'); if (wa) wa.href = waLink(`Hola, quiero pedir ${p.name} (${fmt(p.price)}).`);
 }));
 
@@ -179,17 +179,18 @@ if (calc) {
     const min = Math.round(kg * lo), max = Math.round(kg * hi), mid = Math.round((min + max) / 2);
     const perMeal = Math.round(kg * 0.3);
     const gap = Math.max(0, mid - diet);
+    const P500SERVINGS = (catalog.products.find((x) => x.id === 'ova-pro-500') || {}).servings || 15;
     const scoops = gap / catalog.scoop.proteinGrams;
     const sc = gap === 0 ? 0 : Math.max(0.5, Math.round(scoops * 2) / 2);
-    const days500 = sc ? Math.floor(12 / sc) : null;
+    const days500 = sc ? Math.floor(P500SERVINGS / sc) : null;
     out.innerHTML = `
       <p>Tu meta diaria aproximada</p>
       <p class="total">${min}–${max} g</p>
       <ul>
         <li>Unos <strong>${perMeal} g por comida</strong> repartidos en ${meals} comidas.</li>
         ${diet ? `<li>Con tu comida ya cubres ~${diet} g; te faltan ~${gap} g para llegar a ${mid} g.</li>` : ''}
-        ${!diet ? `<li>Un scoop de OVA PRO+ aporta ${String(catalog.scoop.proteinGrams).replace('.', ',')} g. Escribe cuánta proteína ya comes al día y te decimos cuántos scoops te faltan.</li>`
-          : `<li>${sc ? `Eso equivale a <strong>${String(sc).replace('.', ',')} scoop${sc > 1 ? 's' : ''} de OVA PRO+ al día</strong> (${Math.round(sc * catalog.scoop.proteinGrams)} g de proteína).` : 'Con tu alimentación ya llegas a la meta; OVA PRO+ te sirve como opción práctica.'}</li>
+        ${!diet ? `<li>Una porción de OVA PRO+ (4 scoops de 8 g) aporta ${String(catalog.scoop.proteinGrams).replace('.', ',')} g. Escribe cuánta proteína ya comes al día y te decimos cuántas porciones te faltan.</li>`
+          : `<li>${sc ? `Eso equivale a <strong>${String(sc).replace('.', ',')} porci${sc > 1 ? 'ones' : 'ón'} de OVA PRO+ al día</strong> (${Math.round(sc * 4)} scoops, ${Math.round(sc * catalog.scoop.proteinGrams)} g de proteína).` : 'Con tu alimentación ya llegas a la meta; OVA PRO+ te sirve como opción práctica.'}</li>
         ${days500 ? `<li>Una bolsa de 500 g te dura unos ${days500} días.</li>` : ''}`}
       </ul>
       <p class="note">Rangos basados en la postura de la International Society of Sports Nutrition (2017) para personas sanas que entrenan. No reemplaza la evaluación de un nutricionista; si tienes una condición renal o estás embarazada, consulta antes.</p>

@@ -6,8 +6,9 @@ Edita data/catalog.json (precios, promos, envíos) y data/site.json (datos de ma
 y vuelve a ejecutar. No requiere dependencias externas.
 """
 import json, html, os, re
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).parent
 PUB = ROOT / "public"
@@ -17,6 +18,9 @@ from content import PAGES_CONTENT  # noqa: E402  (textos largos)
 
 URL = SITE["url"].rstrip("/")
 UPDATED = SITE["lastUpdated"]
+# Fecha de hoy en Ecuador: los artículos con "published" posterior no se generan todavía.
+# BUILD_DATE=AAAA-MM-DD permite previsualizar una fecha futura.
+TODAY = os.environ.get("BUILD_DATE") or datetime.now(ZoneInfo("America/Guayaquil")).date().isoformat()
 P = {p["id"]: p for p in CAT["products"]}
 e = html.escape
 
@@ -59,9 +63,9 @@ def facts_panel(compact=False, title_tag="p"):
         ("Lactosa", "0 g", ""),
     ]
     dl = "".join(f'<div class="row {c}"><dt>{a}</dt><dd>{b}</dd></div>' for a, b, c in rows)
-    return f'''<aside class="facts" aria-label="Información nutricional por scoop">
+    return f'''<aside class="facts" aria-label="Información nutricional por porción">
 <{title_tag} class="facts-title">Información nutricional</{title_tag}>
-<p class="serv">Por scoop de {SCOOP} g · {P["ova-pro-500"]["servings"]} scoops en 500 g</p>
+<p class="serv">Por porción de {SCOOP} g (4 scoops) · unas {P["ova-pro-500"]["servings"]} porciones en 500 g</p>
 <dl>{dl}</dl>
 <p class="ingr"><strong>Ingredientes:</strong> clara de huevo.</p>
 </aside>'''
@@ -78,7 +82,7 @@ def nutrition_table():
             ("Lactosa (g)", "0", "0")]
     tr = "".join(f"<tr><th scope=row>{a}</th><td class=num>{b}</td><td class=num>{c}</td></tr>" for a, b, c in rows)
     return f'''<div class="table-wrap"><table><caption>Composición nutricional (valores referenciales del análisis del producto)</caption>
-<thead><tr><th scope=col>Nutriente</th><th scope=col class=num>Por 100 g</th><th scope=col class=num>Por scoop ({SCOOP} g)</th></tr></thead><tbody>{tr}</tbody></table></div>'''
+<thead><tr><th scope=col>Nutriente</th><th scope=col class=num>Por 100 g</th><th scope=col class=num>Por porción ({SCOOP} g, 4 scoops)</th></tr></thead><tbody>{tr}</tbody></table></div>'''
 
 
 def amino_list():
@@ -200,7 +204,7 @@ def layout(path, title, desc, body, schema=(), noindex=False, og="og-ova-pro.jpg
 <footer class="footer"><div class="wrap">
 <div class="cols">
 <div><a class="logo" href="/"><img src="/assets/img/logo-ova-pro.webp" alt="OVA PRO+" width="244" height="142"></a>
-<p style="margin-top:1rem">Proteína de albúmina de huevo. Un solo ingrediente: clara de huevo. Hecha para entrenar fuerte y hecha en Ecuador para todo el país.</p>
+<p style="margin-top:1rem">Proteína de albúmina de huevo. Un solo ingrediente: clara de huevo. Hecha para entrenar fuerte. Clara importada y pasteurizada, empacada en Quito para todo el país.</p>
 <p><a href="{wa_url('Hola, tengo una consulta sobre OVA PRO+.')}">WhatsApp {e(SITE['whatsappDisplay'])}</a><br><a href="mailto:{SITE['email']}">{SITE['email']}</a><br>{e(SITE['hours'])}</p>{social_links()}</div>
 <div><h2>Tienda</h2><ul><li><a href="/proteina-de-huevo-ova-pro/">OVA PRO+ 500 g</a></li><li><a href="/promociones/">Promociones</a></li><li><a href="/envios-y-pagos/">Envíos y pagos</a></li><li><a href="/carrito/">Carrito</a></li></ul></div>
 <div><h2>Aprende</h2><ul><li><a href="/proteina-de-huevo/">Guía de proteína de huevo</a></li><li><a href="/ova-vs-whey/">OVA PRO+ vs whey</a></li><li><a href="/calculadora-de-proteina/">Calculadora de proteína</a></li><li><a href="/blog/">Blog</a></li><li><a href="/preguntas-frecuentes/">Preguntas frecuentes</a></li></ul></div>
@@ -236,7 +240,7 @@ def promo_line(pid):
 
 def product_card(pid, featured=False, cta_add=True):
     p = P[pid]
-    per = f'{money(round(p["price"]/p["servings"]))} por scoop · {p["servings"]} scoops' if p["servings"] else p["short"]
+    per = f'{money(round(p["price"]/p["servings"]))} por porción · {p["servings"]} porciones' if p["servings"] else p["short"]
     cmp_ = f'<small>por separado {money(p["compareAt"])}</small>' if p.get("compareAt") else ""
     tag = f'<span class="tag{" promo" if p["promo"] else ""}">{e(p["tag"])}</span>' if p["tag"] else ""
     return f'''<article class="product{" featured" if featured else ""}">
@@ -272,7 +276,7 @@ def page_head(crumbs, h1, lead="", byline=False):
 CTX = dict(social_links=social_links, promo_line=promo_line, HILLS=HILLS, P=P, CAT=CAT, SITE=SITE, URL=URL, money=money, facts_panel=facts_panel, nutrition_table=nutrition_table,
            amino_list=amino_list, product_card=product_card, faq_block=faq_block, article_schema=article_schema,
            page_head=page_head, breadcrumb=breadcrumb, org_schema=org_schema, wa_url=wa_url, e=e, dec=dec,
-           per_scoop=per_scoop, EAA=EAA, BCAA=BCAA, PS=PS, SCOOP=SCOOP, PER100=PER100, ICON_WA=ICON_WA, UPDATED=UPDATED)
+           per_scoop=per_scoop, EAA=EAA, BCAA=BCAA, PS=PS, SCOOP=SCOOP, PER100=PER100, ICON_WA=ICON_WA, UPDATED=UPDATED, TODAY=TODAY)
 
 
 def write(path, content):
@@ -289,8 +293,8 @@ def merchant_feed():
             continue
         link = URL + "/proteina-de-huevo-ova-pro/"
         desc = (f"Proteína de albúmina (clara) de huevo en polvo, sin sabor. Un solo ingrediente: clara de huevo. "
-                f"{dec(CAT['scoop']['proteinGrams'])} g de proteína por scoop de {CAT['scoop']['grams']} g, 83 % proteína, 0 % lactosa. "
-                f"Bolsa de {p['sizeGrams']} g, {p['servings']} scoops. Contiene huevo.")
+                f"{dec(CAT['scoop']['proteinGrams'])} g de proteína por porción de {CAT['scoop']['grams']} g (4 scoops), 83 % proteína, 0 % lactosa. "
+                f"Bolsa de {p['sizeGrams']} g, unas {p['servings']} porciones. Contiene huevo.")
         items.append(f"""<item>
 <g:id>{p['sku']}</g:id>
 <g:title>{e(p['name'])} Proteína de clara de huevo sin sabor</g:title>
@@ -321,6 +325,13 @@ def main():
     (js / "site.mjs").write_text("// Generado por build.py desde data/site.json. No editar a mano.\nexport default " + json.dumps(pub_site, ensure_ascii=False, indent=1) + ";\n", encoding="utf-8")
 
     pages = PAGES_CONTENT(CTX)
+    # Borra páginas de blog que ya no se generan (p. ej. artículos programados a futuro)
+    keep = {pg["path"].strip("/") for pg in pages}
+    for d in (PUB / "blog").glob("*/"):
+        if f"blog/{d.name}" not in keep and (d / "index.html").exists():
+            (d / "index.html").unlink()
+            if not any(d.iterdir()):
+                d.rmdir()
     sitemap = []
     for pg in pages:
         write(pg["path"], layout(pg["path"], pg["title"], pg["desc"], pg["body"], pg.get("schema", ()), pg.get("noindex", False),

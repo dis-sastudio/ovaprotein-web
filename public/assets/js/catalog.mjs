@@ -5,8 +5,11 @@ export default {
  "taxRate": 0.15,
  "pricesIncludeTax": true,
  "scoop": {
-  "grams": 40,
-  "proteinGrams": 33.2
+  "_nota": "Porción recomendada: 4 scoops de 8 g = 32 g de polvo. proteinGrams = proteína por porción (83,07 %).",
+  "grams": 32,
+  "proteinGrams": 26.6,
+  "scoopGrams": 8,
+  "scoopsPerServing": 4
  },
  "products": [
   {
@@ -14,9 +17,9 @@ export default {
    "sku": "OVAPRO-500",
    "gtin": "",
    "name": "OVA PRO+ 500 g",
-   "short": "Bolsa de 500 g · 12 scoops",
+   "short": "Bolsa de 500 g · 15 porciones",
    "sizeGrams": 500,
-   "servings": 12,
+   "servings": 15,
    "price": 2700,
    "compareAt": null,
    "image": "ova-pro-bolsa",
@@ -37,7 +40,7 @@ export default {
    },
    {
     "id": "nacional",
-    "label": "Otras provincias de Ecuador continental (Servientrega 24–72 h)",
+    "label": "Otras provincias de Ecuador continental (24–72 h)",
     "price": 500
    }
   ]
