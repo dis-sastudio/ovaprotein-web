@@ -85,7 +85,7 @@ export function tplOrderReceived(o) {
   const payBox = transfer
     ? `<div style="background:#EAF1EB;border-left:4px solid #10B981;padding:14px 16px;margin:0 0 16px;font-size:15px;line-height:1.5">
 <strong>Para completar tu compra, transfiere ${money(o.total)}:</strong><br>
-${bank.length ? bank.map(esc).join('<br>') : 'Te enviaremos los datos de la cuenta por WhatsApp en unos minutos.'}<br>
+${bank.length ? bank.map(esc).join('<br>') : 'Escríbenos por WhatsApp con tu número de pedido y te pasamos los datos para transferir.'}<br>
 <strong>Referencia:</strong> ${esc(o.id)}</div>
 <p style="font-size:15px;margin:0 0 16px">Cuando transfieras, envíanos el comprobante por WhatsApp y despachamos tu pedido.</p>
 <p style="margin:0 0 20px"><a href="${waLink(`Hola, envío el comprobante de mi pedido ${o.id} por ${money(o.total)}.`)}" style="background:#25D366;color:#0b2b17;text-decoration:none;padding:12px 18px;font-weight:bold;display:inline-block">Enviar comprobante por WhatsApp</a></p>`
