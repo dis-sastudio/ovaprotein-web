@@ -113,17 +113,20 @@ $('#pay-card').addEventListener('click', async () => {
 const docTypeName = (v) => ({ 1: 'cedula', 2: 'ruc', 3: 'pasaporte' })[v] || 'cedula';
 
 function showConfirmation(r, o, cu) {
-  const wa = waLink(`Hola, hice el pedido ${r.id} por ${fmt(r.total)} en la web. Adjunto el comprobante de transferencia.`);
-  const bank = r.bank && r.bank.length
-    ? `<div class="answer"><p><strong>Transfiere ${fmt(r.total)} a:</strong><br>${r.bank.map(escapeHtml).join('<br>')}<br><strong>Referencia:</strong> ${escapeHtml(r.id)}</p></div>`
-    : `<p>Te enviamos los datos de la cuenta por WhatsApp en unos minutos.</p>`;
+  const hasBank = r.bank && r.bank.length;
+  const wa = waLink(hasBank
+    ? `Hola, hice el pedido ${r.id} por ${fmt(r.total)} en la web. Adjunto el comprobante de transferencia.`
+    : `Hola, hice el pedido ${r.id} por ${fmt(r.total)} en la web. ¿Me pasan los datos para transferir?`);
+  const bank = hasBank
+    ? `<div class="answer"><p><strong>Transfiere ${fmt(r.total)} a:</strong><br>${r.bank.map(escapeHtml).join('<br>')}<br><strong>Referencia:</strong> ${escapeHtml(r.id)}</p></div>
+       <p>${r.emailSent ? `También te enviamos estos datos a <strong>${escapeHtml(cu.email)}</strong>.` : 'Guarda tu número de pedido.'} Cuando transfieras, envíanos el comprobante por WhatsApp y despachamos tu pedido.</p>`
+    : `<p>Para completar tu compra, escríbenos por WhatsApp con tu número de pedido y te pasamos los datos para transferir. Cuando transfieras, envíanos el comprobante por el mismo chat y despachamos tu pedido.</p>`;
   document.querySelector('.checkout').outerHTML = `<div class="box status-card" id="done" tabindex="-1" style="text-align:left;max-width:640px">
     <p class="icon" style="color:var(--emerald-ink)">✓</p>
     <h2>Pedido ${escapeHtml(r.id)} registrado</h2>
     <p class="lead">Total ${fmt(r.total)} (incluye envío ${fmt(r.shipping)}).</p>
     ${bank}
-    <p>${r.emailSent ? `También te enviamos estos datos a <strong>${escapeHtml(cu.email)}</strong>.` : 'Guarda tu número de pedido.'} Cuando transfieras, envíanos el comprobante por WhatsApp y despachamos tu pedido.</p>
-    <p><a class="btn btn-wa" target="_blank" rel="noopener" href="${wa}">Enviar comprobante por WhatsApp</a></p>
+    <p><a class="btn btn-wa" target="_blank" rel="noopener" href="${wa}">${hasBank ? 'Enviar comprobante por WhatsApp' : 'Pedir datos por WhatsApp'}</a></p>
   </div>`;
   document.getElementById('done').focus();
 }
