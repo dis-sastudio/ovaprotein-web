@@ -25,7 +25,7 @@ export const menu = MENU;
 
 const I = {
   menu: () => ({
-    text: `¡Hola! Soy el asistente de *OVA PRO+* 💪\nProteína 100 % clara de huevo: 83 % proteína, 33,2 g por scoop y 0 % lactosa.\n\n¿En qué te ayudo?`,
+    text: `¡Hola! Soy el asistente de *OVA PRO+* 💪\nProteína 100 % clara de huevo: 83 % proteína, 26,6 g por porción (4 scoops) y 0 % lactosa.\n\n¿En qué te ayudo?`,
     list: MENU,
   }),
   precios: () => {
@@ -34,7 +34,7 @@ const I = {
     return {
       text:
         `*Precios (IVA incluido)*\n` +
-        `• ${p.name}: ${money(p.price)} (12 scoops). ${CARD ? 'Pagas con tarjeta o transferencia.' : 'Pago por transferencia o depósito.'}\n` +
+        `• ${p.name}: ${money(p.price)} (15 porciones de 4 scoops). ${CARD ? 'Pagas con tarjeta o transferencia.' : 'Pago por transferencia o depósito.'}\n` +
         (pr ? `• *Promo:* 2 bolsas por ${money(pr.unitPrice * pr.minQty)} (${money(pr.unitPrice)} c/u) pagando por transferencia o depósito.\n` : '') +
         `\nEl envío no está incluido: ${catalog.shipping.zones.map((z) => `${z.label.split(' (')[0]} ${money(z.price)}`).join(', ')}.\n` +
         `Por ahora solo tenemos la presentación de 500 g.`,
@@ -66,21 +66,21 @@ const I = {
   },
   tabla: () => ({
     text:
-      `*Por scoop de 40 g*\n` +
-      `• Energía: 143 kcal\n• Proteína: 33,2 g\n• Carbohidratos: 1,6 g\n• Grasa: 0,4 g\n• Leucina: ≈3,0 g · BCAA: ≈7,2 g\n` +
-      `• Aminoácidos esenciales: ≈15,5 g\n\n` +
+      `*Por porción: 4 scoops = 32 g*\n` +
+      `• Energía: 114 kcal\n• Proteína: 26,6 g\n• Carbohidratos: 1,3 g\n• Grasa: 0,3 g\n• Leucina: ≈2,4 g · BCAA: ≈5,7 g\n` +
+      `• Aminoácidos esenciales: ≈12,4 g\n\n` +
       `*Por 100 g*: 357 kcal · 83,07 g proteína · 4,05 g carbohidratos · 1,00 g grasa.\n` +
-      `Ingrediente único: clara de huevo deshidratada y pasteurizada.\n\nTabla completa: ${url('/proteina-de-huevo-ova-pro/#nutricion')}`,
+      `Ingrediente único: clara de huevo deshidratada y pasteurizada (importada, empacada en Quito).\n\nTabla completa: ${url('/proteina-de-huevo-ova-pro/#nutricion')}`,
     buttons: [{ id: 'uso', title: 'Cómo se toma' }, { id: 'comprar', title: 'Comprar' }, { id: 'menu', title: 'Menú' }],
   }),
   uso: () => ({
     text:
       `*Cómo se toma*\n` +
       `1. Pon 250–300 ml de agua, leche vegetal o tu batido en el shaker.\n` +
-      `2. Agrega 1 scoop (40 g = 33,2 g de proteína).\n` +
+      `2. Agrega 4 scoops (1 porción: 32 g = 26,6 g de proteína). El scoop de la bolsa es de 8 g.\n` +
       `3. Agita 20–30 segundos.\n\n` +
       `No tiene sabor, así que va bien con fruta, avena, café frío o en recetas (pancakes, waffles, avena horneada).\n` +
-      `La mayoría de personas activas usa 1–2 scoops al día para completar su requerimiento. Calcula el tuyo: ${url('/calculadora-de-proteina/')}`,
+      `La mayoría de personas activas usa 1–2 porciones al día para completar su requerimiento. Calcula el tuyo: ${url('/calculadora-de-proteina/')}`,
     buttons: [{ id: 'tabla', title: 'Tabla nutricional' }, { id: 'comprar', title: 'Comprar' }, { id: 'menu', title: 'Menú' }],
   }),
   envios: () => ({
@@ -102,7 +102,7 @@ const I = {
     text:
       `*OVA PRO+ vs whey*\n` +
       `• OVA PRO+ no es un lácteo: 0 % lactosa y sin proteínas de leche. Útil si la whey te cae pesada.\n` +
-      `• Proteína completa: trae los 9 aminoácidos esenciales; ≈3 g de leucina por scoop.\n` +
+      `• Proteína completa: trae los 9 aminoácidos esenciales; ≈2,4 g de leucina por porción.\n` +
       `• Muy baja en grasa (1 %) y carbohidratos (4 %).\n` +
       `• La whey tiene algo más de leucina por gramo; ambas son proteínas de alta calidad.\n\n` +
       `Comparativa completa: ${url('/ova-vs-whey/')}`,
