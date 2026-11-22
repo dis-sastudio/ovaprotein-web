@@ -317,6 +317,55 @@ def merchant_feed():
             f'<title>OVA PRO+</title><link>{URL}/</link><description>Productos OVA PRO+</description>' + "".join(items) + '</channel></rss>\n')
 
 
+def links_page():
+    """Página tipo Linktree (/links/) para la bio de redes y los QR impresos."""
+    links = [
+        ("Comprar OVA PRO+ 500 g · $27", "/proteina-de-huevo-ova-pro/?utm_source=links", True),
+        ("Promo 2 bolsas por $50 (transferencia)", wa_url("Hola, quiero la promo 2 bolsas por $50."), False),
+        ("Pedir por WhatsApp", wa_url("Hola, quiero pedir OVA PRO+."), False),
+        ("Calcula cuánta proteína necesitas", "/calculadora-de-proteina/", False),
+        ("OVA PRO+ vs whey", "/ova-vs-whey/", False),
+        ("Recetas con proteína de huevo", "/blog/recetas-con-proteina-de-huevo/", False),
+        ("Envíos y pagos", "/envios-y-pagos/", False),
+    ]
+    btns = "".join(f'<a class="l{" main" if m else ""}" href="{e(u)}"{" target=_blank rel=noopener" if u.startswith("http") else ""}>{e(t)}</a>' for t, u, m in links)
+    return f'''<!doctype html>
+<html lang="es-EC"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OVA PRO+ · Enlaces</title>
+<meta name="description" content="Compra OVA PRO+, proteína de clara de huevo, y encuentra todos nuestros enlaces.">
+<link rel="canonical" href="{URL}/links/"><meta name="robots" content="noindex, follow">
+<meta name="theme-color" content="#0F3B2C"><link rel="icon" href="/favicon.png" type="image/png">
+<meta property="og:title" content="OVA PRO+ · Enlaces"><meta property="og:image" content="{URL}/assets/img/og-ova-pro.jpg">
+<style>
+@font-face{{font-family:Outfit;font-weight:400;font-display:swap;src:url(/assets/fonts/outfit-latin-400-normal.woff2) format("woff2")}}
+@font-face{{font-family:Outfit;font-weight:600;font-display:swap;src:url(/assets/fonts/outfit-latin-600-normal.woff2) format("woff2")}}
+*{{box-sizing:border-box;margin:0}}
+body{{font-family:Outfit,system-ui,sans-serif;background:#0F3B2C;color:#fff;min-height:100vh;display:flex;justify-content:center;padding:36px 18px 48px}}
+main{{width:100%;max-width:440px;text-align:center}}
+.logo{{width:150px;height:auto}}
+h1{{font-size:1.15rem;font-weight:400;color:#E8DCCB;margin:10px 0 4px}}
+.tag{{font-size:.95rem;color:#CFE0D5;margin-bottom:22px}}
+.bag{{width:130px;height:auto;margin:0 auto 20px;display:block;filter:drop-shadow(0 10px 14px rgba(0,0,0,.35))}}
+.l{{display:block;background:#fff;color:#0F3B2C;text-decoration:none;font-weight:600;font-size:1.02rem;padding:16px 18px;border-radius:14px;margin-bottom:12px;transition:transform .15s}}
+.l:hover{{transform:translateY(-2px)}}
+.l.main{{background:#008D36;color:#fff}}
+.soc{{display:flex;justify-content:center;gap:18px;margin-top:22px}}
+.soc a{{color:#fff;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center}}
+.soc svg{{width:22px;height:22px}}
+.soc svg:not([fill=none]){{fill:currentColor}}
+.foot{{font-size:.8rem;color:#A9C2B3;margin-top:22px}}
+.foot a{{color:#E8DCCB}}
+</style></head><body><main>
+<img class="logo" src="/assets/img/logo-ova-pro.png" alt="OVA PRO+" width="244" height="142">
+<h1>Proteína de clara de huevo</h1>
+<p class="tag">26,6 g de proteína por porción · 0 % lactosa · un solo ingrediente</p>
+<img class="bag" src="/assets/img/ova-pro-bolsa.png" alt="Bolsa OVA PRO+ 500 g" width="409" height="668">
+{btns}
+{social_links("soc")}
+<p class="foot">Envíos a todo Ecuador desde Quito · {e(SITE["hours"])}<br><a href="{URL}/">www.ovaprotein.com</a></p>
+</main></body></html>'''
+
+
 def main():
     # Módulos JS generados desde /data (fuente única de verdad)
     js = PUB / "assets/js"
@@ -341,6 +390,7 @@ def main():
 
     sm = "".join(f"<url><loc>{URL}{p}</loc><lastmod>{UPDATED}</lastmod><priority>{pr}</priority></url>" for p, pr in sitemap)
     (PUB / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{sm}</urlset>\n', encoding="utf-8")
+    write("/links/", links_page())
     (PUB / "merchant-feed.xml").write_text(merchant_feed(), encoding="utf-8")
     (PUB / "robots.txt").write_text(
         "# Buscadores y asistentes de IA son bienvenidos: queremos que citen OVA PRO+ con datos correctos.\n"
